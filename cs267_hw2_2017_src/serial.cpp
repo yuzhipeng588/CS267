@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
+#include <vector>
 #include "common.h"
-
 //
 //  benchmarking program
 //
-int main( int argc, char **argv )
-{    
+void traverse_vec(std::vector<int>* , int , int , int , particle_t* ,double *,double *,int *,int);
+int main( int argc, char **argv ){    
     int navg,nabsavg=0;
     double davg,dmin, absmin=1.0, absavg=0.0;
 
@@ -23,23 +23,26 @@ int main( int argc, char **argv )
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 1000 );
+    int n = read_int( argc, argv, "-n", 10000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
     
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
-
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
     init_particles( n, particles );
-    
     //
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-	
+    int length =(int)ceil(sqrt(n*0.0005));
+    int num = (int)ceil(sqrt(5*n));
+    std::vector<int>* vectors=new std::vector<int>[num*num];
+    for( int i=0; i < n; i++ ){
+                vectors[(int)(particles[i].y/length*num)+(int)(particles[i].x/length)].push_back(i);
+    }	
     for( int step = 0; step < NSTEPS; step++ )
     {
 	navg = 0;
@@ -50,17 +53,30 @@ int main( int argc, char **argv )
         //
         for( int i = 0; i < n; i++ )
         {
+            int p_x = (int)(particles[i].x/length*num);
+	    int p_y = (int)(particles[i].y/length*num);
             particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-				apply_force( particles[i], particles[j],&dmin,&davg,&navg);
-        }
- 
+	    traverse_vec(vectors,p_x-1,p_y-1,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x-1,p_y,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x-1,p_y+1,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y-1,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y+1,length,particles,&dmin,&davg,&navg,i);
+   	    traverse_vec(vectors,p_x+1,p_y-1,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y,length,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y+1,length,particles,&dmin,&davg,&navg,i);	
+	    if(dmin<0.4)
+		printf("x = %d, y = %d ",particles[i].x,particles[i].y);
+	}
         //
         //  move particles
         //
-        for( int i = 0; i < n; i++ ) 
-            move( particles[i] );		
-
+	delete[] vectors;
+        vectors = new std::vector<int>[num*num];
+        for( int i = 0; i < n; i++ ){
+            move( particles[i] );
+            vectors[(int)(particles[i].y/length*num)+(int)(particles[i].x/length)].push_back(i);
+        }
         if( find_option( argc, argv, "-no" ) == -1 )
         {
           //
@@ -115,4 +131,12 @@ int main( int argc, char **argv )
         fclose( fsave );
     
     return 0;
+}
+void traverse_vec(std::vector<int>* vectors, int p_x, int p_y, int length, particle_t* particles,double *dmin,double* davg, int* navg,int i){
+if(p_x>=0&&p_x<length&&p_y>=0&&p_y<length){
+                for(std::vector<int>::iterator it = vectors[p_y*length+p_x].begin(); it != vectors[p_y*length+p_x].end(); ++it) {
+                         int part_ = *it;
+			 apply_force( particles[i], particles[part_],dmin,davg,navg);
+                }
+            }
 }
