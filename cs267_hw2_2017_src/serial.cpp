@@ -56,17 +56,15 @@ int main( int argc, char **argv ){
             int p_x = (int)(particles[i].x/length*num);
 	    int p_y = (int)(particles[i].y/length*num);
             particles[i].ax = particles[i].ay = 0;
-	    traverse_vec(vectors,p_x-1,p_y-1,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x-1,p_y,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x-1,p_y+1,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x,p_y-1,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x,p_y,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x,p_y+1,length,particles,&dmin,&davg,&navg,i);
-   	    traverse_vec(vectors,p_x+1,p_y-1,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x+1,p_y,length,particles,&dmin,&davg,&navg,i);
-	    traverse_vec(vectors,p_x+1,p_y+1,length,particles,&dmin,&davg,&navg,i);	
-	    if(dmin<0.4)
-		printf("x = %d, y = %d ",particles[i].x,particles[i].y);
+	    traverse_vec(vectors,p_x-1,p_y-1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x-1,p_y,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x-1,p_y+1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y-1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y+1,num,particles,&dmin,&davg,&navg,i);
+   	    traverse_vec(vectors,p_x+1,p_y-1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y+1,num,particles,&dmin,&davg,&navg,i);	
 	}
         //
         //  move particles
@@ -132,9 +130,9 @@ int main( int argc, char **argv ){
     
     return 0;
 }
-void traverse_vec(std::vector<int>* vectors, int p_x, int p_y, int length, particle_t* particles,double *dmin,double* davg, int* navg,int i){
-if(p_x>=0&&p_x<length&&p_y>=0&&p_y<length){
-                for(std::vector<int>::iterator it = vectors[p_y*length+p_x].begin(); it != vectors[p_y*length+p_x].end(); ++it) {
+void traverse_vec(std::vector<int>* vectors, int p_x, int p_y, int num, particle_t* particles,double *dmin,double* davg, int* navg,int i){
+if(p_x>=0&&p_x<num&&p_y>=0&&p_y<num){
+                for(std::vector<int>::iterator it = vectors[p_y*num+p_x].begin(); it != vectors[p_y*num+p_x].end(); ++it) {
                          int part_ = *it;
 			 apply_force( particles[i], particles[part_],dmin,davg,navg);
                 }
