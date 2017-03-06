@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <math.h>
 #include <vector>
+#include <algorithm>
 #include "common.h"
 //
 //  benchmarking program
@@ -23,7 +24,7 @@ int main( int argc, char **argv ){
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 10000 );
+    int n = read_int( argc, argv, "-n", 1000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -37,11 +38,11 @@ int main( int argc, char **argv ){
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    int length =(int)ceil(sqrt(n*0.0005));
+    double length =sqrt(n*0.0005);
     int num = (int)ceil(sqrt(5*n));
     std::vector<int>* vectors=new std::vector<int>[num*num];
     for( int i=0; i < n; i++ ){
-                vectors[(int)(particles[i].y/length*num)+(int)(particles[i].x/length)].push_back(i);
+                vectors[(int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num)].push_back(i);
     }	
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -69,11 +70,19 @@ int main( int argc, char **argv ){
         //
         //  move particles
         //
-	delete[] vectors;
-        vectors = new std::vector<int>[num*num];
+	//delete[] vectors;
+       // vectors = new std::vector<int>[num*num];
         for( int i = 0; i < n; i++ ){
+            int num_subset_old = (int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num);
             move( particles[i] );
-            vectors[(int)(particles[i].y/length*num)+(int)(particles[i].x/length)].push_back(i);
+            int num_subset_new = (int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num);
+            if(num_subset_old!=num_subset_new){
+                 std::vector<int>::iterator position = std::find(vectors[num_subset_old].begin(),vectors[num_subset_old].end(),i);
+                 if(position != vectors[num_subset_old].end()){
+                         vectors[num_subset_old].erase(position);
+                         vectors[num_subset_new].push_back(i);
+                 }
+            }
         }
         if( find_option( argc, argv, "-no" ) == -1 )
         {
@@ -123,7 +132,8 @@ int main( int argc, char **argv ){
     // Clearing space
     //
     if( fsum )
-        fclose( fsum );    
+        fclose( fsum );
+    delete[] vectors;    
     free( particles );
     if( fsave )
         fclose( fsave );

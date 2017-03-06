@@ -6,5 +6,28 @@
 #SBATCH -e openmp24.%j.error
 #SBATCH -N 1			# you'll never need more than 1 node for the openmp code
 
-export OMP_NUM_THREADS=24
-srun -n 1 -c 24 ./openmp -n 500 -o openmp.txt
+export OMP_NUM_THREADS=1
+srun -n 1 -c 1 ./serial -n 500 -o openmp.txt
+
+export OMP_NUM_THREADS=1
+srun -n 1 -c 1 ./openmp -p 1 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=2
+srun -n 1 -c 2 ./openmp -p 2 -n 500 -no -s  openmp.txt
+export OMP_NUM_THREADS=4
+srun -n 1 -c 4 ./openmp -p 4 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=6
+srun -n 1 -c 6 ./openmp -p 6 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=8
+srun -n 1 -c 8 ./openmp -p 8 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=10
+srun -n 1 -c 10 ./openmp -p 10 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=12
+srun -n 1 -c 12 ./openmp -p 12 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=14
+srun -n 1 -c 14 ./openmp -p 14 -n 500 -no -s openmp.txt
+export OMP_NUM_THREADS=2
+srun -n 1 -c 2 ./openmp -p 2 -n 1000 -no -s openmp.txt
+export OMP_NUM_THREADS=4
+srun -n 1 -c 4 ./openmp -p 4 -n 2000 -no -s openmp.txt
+export OMP_NUM_THREADS=6
+srun -n 1 -c 6 ./openmp -p 6 -n 3000 -no -s openmp.txt
