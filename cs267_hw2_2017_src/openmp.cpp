@@ -63,42 +63,41 @@ int main( int argc, char **argv )
         //
         //  compute all forces
         //
-/*        #pragma omp for schedule(dynamic) reduction (+:navg) reduction(+:davg)
-        for(int i = 0; i < n; i++ ) {
-            int p_x = (int)(particles[i].x/length*num);
-            int p_y = (int)(particles[i].y/length*num);
-            particles[i].ax = particles[i].ay = 0;
-            traverse_vec(vectors,p_x-1,p_y-1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x-1,p_y,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x-1,p_y+1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x,p_y-1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x,p_y,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x,p_y+1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x+1,p_y-1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x+1,p_y,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x+1,p_y+1,num,particles,&dmin,&davg,&navg,i);
-	}
-*/
         #pragma omp for schedule(dynamic) reduction (+:navg) reduction(+:davg)
         for(int i = 0; i < n; i++ ) {
-	  
             int p_x = (int)(particles[i].x/length*num);
             int p_y = (int)(particles[i].y/length*num);
             particles[i].ax = particles[i].ay = 0;
             traverse_vec(vectors,p_x-1,p_y-1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x-1,p_y,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x-1,p_y+1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x,p_y-1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x,p_y,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x,p_y+1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x+1,p_y-1,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x+1,p_y,num,particles,&dmin,&davg,&navg,i);
-            traverse_vec(vectors,p_x+1,p_y+1,num,particles,&dmin,&davg,&navg,i);
-        }	
+ 	    traverse_vec(vectors,p_x-1,p_y,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x-1,p_y+1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y-1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x,p_y+1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y-1,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y,num,particles,&dmin,&davg,&navg,i);
+	    traverse_vec(vectors,p_x+1,p_y+1,num,particles,&dmin,&davg,&navg,i);
+	}
+/*
+        #pragma omp for schedule(dynamic) reduction (+:navg) reduction(+:davg)
+        for(int i = 0; i < n; i++ ) {
+	    #pragma omp parallel
+	    {
+            int p_x = (int)(particles[i].x/length*num);
+            int p_y = (int)(particles[i].y/length*num);
+            particles[i].ax = particles[i].ay = 0;
+	    
+	    for(int j=p_x-1;j<=p_x+1;j++){
+		for(int k=p_y-1;k<=p_y+1;k++)
+                    traverse_vec(vectors,j,k,num,particles,&dmin,&davg,&navg,i);
+            }
+	    }
+        }
+*/	
         //
         //  move particles
         //
-        #pragma omp for schedule(dynamic) 
+        #pragma omp for schedule(dynamic) nowait 
         for( int i = 0; i < n; i++ ){
 	    int num_subset_old = (int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num);
             move( particles[i] );
