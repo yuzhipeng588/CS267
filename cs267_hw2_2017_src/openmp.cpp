@@ -26,7 +26,7 @@ int main( int argc, char **argv )
         return 0;
     }
 
-    int n = read_int( argc, argv, "-n", 1500 );
+    int n = read_int( argc, argv, "-n", 1000 );
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
 
@@ -52,9 +52,10 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    #pragma omp parallel shared(particles,vectors,lock,absmin) private(dmin) 
-    {
+//    #pragma omp parallel shared(particles,vectors,lock,absmin) private(dmin) 
+//    {
     numthreads = omp_get_num_threads();
+//    printf("%d",NSTEPS);
     for( int step = 0; step < NSTEPS; step++ )
     {
         navg = 0;
@@ -63,6 +64,9 @@ int main( int argc, char **argv )
         //
         //  compute all forces
         //
+    #pragma omp parallel shared(particles,vectors,lock,absmin) private(dmin) 
+    {
+
         #pragma omp for schedule(dynamic) reduction (+:navg) reduction(+:davg)
         for(int i = 0; i < n; i++ ) {
             int p_x = (int)(particles[i].x/length*num);
@@ -78,6 +82,7 @@ int main( int argc, char **argv )
 	    traverse_vec(vectors,p_x+1,p_y,num,particles,&dmin,&davg,&navg,i);
 	    traverse_vec(vectors,p_x+1,p_y+1,num,particles,&dmin,&davg,&navg,i);
 	}
+
 /*
         #pragma omp for schedule(dynamic) reduction (+:navg) reduction(+:davg)
         for(int i = 0; i < n; i++ ) {
@@ -97,6 +102,7 @@ int main( int argc, char **argv )
         //
         //  move particles
         //
+
         #pragma omp for schedule(dynamic) nowait 
         for( int i = 0; i < n; i++ ){
 	    int num_subset_old = (int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num);

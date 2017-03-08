@@ -3,10 +3,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include "common.h"
-
+#include <vector>
+#include <algorithm>
+#include <math.h>
 //
 //  benchmarking program
 //
+void traverse_vec(std::vector<int>* , int , int , int , particle_t* ,double *,double *,int *,particle_t*,int);
 int main( int argc, char **argv )
 {    
     int navg, nabsavg=0;
@@ -56,6 +59,7 @@ int main( int argc, char **argv )
     //
     //  set up the data partitioning across processors
     //
+
     int particle_per_proc = (n + n_proc - 1) / n_proc;
     int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
     for( int i = 0; i < n_proc+1; i++ )
@@ -64,7 +68,9 @@ int main( int argc, char **argv )
     int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
     for( int i = 0; i < n_proc; i++ )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
-    
+
+    int length =(int)ceil(sqrt(n*0.0005));
+    int num = (int)ceil(sqrt(5*n));
     //
     //  allocate storage for local partition
     //
@@ -92,7 +98,10 @@ int main( int argc, char **argv )
         //  collect all global data locally (not good idea to do)
         //
         MPI_Allgatherv( local, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
-        
+    	std::vector<int>* vectors=new std::vector<int>[num*num];
+        for( int i=0; i < n; i++ ){
+                vectors[(int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num)].push_back(i);
+        }    
         //
         //  save current step if necessary (slightly different semantics than in other codes)
         //
@@ -106,8 +115,17 @@ int main( int argc, char **argv )
         for( int i = 0; i < nlocal; i++ )
         {
             local[i].ax = local[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-                apply_force( local[i], particles[j], &dmin, &davg, &navg );
+            int p_x = (int)(local[i].x/length*num);
+            int p_y = (int)(local[i].y/length*num);
+            traverse_vec(vectors,p_x-1,p_y-1,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x-1,p_y,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x-1,p_y+1,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x,p_y-1,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x,p_y,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x,p_y+1,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x+1,p_y-1,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x+1,p_y,num,particles,&dmin,&davg,&navg,local,i);
+            traverse_vec(vectors,p_x+1,p_y+1,num,particles,&dmin,&davg,&navg,local,i);
         }
      
         if( find_option( argc, argv, "-no" ) == -1 )
@@ -135,6 +153,7 @@ int main( int argc, char **argv )
         //
         for( int i = 0; i < nlocal; i++ )
             move( local[i] );
+	delete[] vectors;
     }
     simulation_time = read_timer( ) - simulation_time;
   
@@ -179,4 +198,12 @@ int main( int argc, char **argv )
     MPI_Finalize( );
     
     return 0;
+}
+void traverse_vec(std::vector<int>* vectors, int p_x, int p_y, int num, particle_t* particles,double *dmin,double* davg, int* navg,particle_t* local,int i){
+            if(p_x>=0&&p_x<num&&p_y>=0&&p_y<num){
+                for(std::vector<int>::iterator it = vectors[p_y*num+p_x].begin(); it != vectors[p_y*num+p_x].end(); ++it) {
+                         int part_ = *it;
+                         apply_force( local[i], particles[part_],dmin,davg,navg);
+                }
+            }
 }

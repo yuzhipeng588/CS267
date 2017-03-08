@@ -24,7 +24,7 @@ int main( int argc, char **argv ){
         return 0;
     }
     
-    int n = read_int( argc, argv, "-n", 10000 );
+    int n = read_int( argc, argv, "-n", 1000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
@@ -70,6 +70,7 @@ int main( int argc, char **argv ){
         //
         //  move particles
         //
+
         for( int i = 0; i < n; i++ ){
             int num_subset_old = (int)(particles[i].y/length*num)*num+(int)(particles[i].x/length*num);
             move( particles[i] );
@@ -82,6 +83,7 @@ int main( int argc, char **argv ){
                  }
             }
         }
+
         if( find_option( argc, argv, "-no" ) == -1 )
         {
           //
