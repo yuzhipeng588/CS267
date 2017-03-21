@@ -1,0 +1,30 @@
+#!/bin/bash -l 
+#SBATCH -A mp309
+#SBATCH -p debug
+#SBATCH -N 1
+#SBATCH -t 00:10:00 
+#SBATCH -J upc-HW3
+#SBATCH -o upc-HW3.%j.out
+#SBATCH -e upc-HW3.%j.err
+
+# Parameters
+P=3				# Number of UPC processes to run
+INPUT=test		# Path to your input file
+
+cd ${PWD}
+
+# Run program
+srun -n 1 ./serial ${INPUT}
+upcrun -n $P -shared-heap=1G ./pgen ${INPUT}
+
+
+# Sort contigs in both output files to compare
+sort serial.out > serial.sorted
+sort pgen.out > pgen.sorted
+
+# diff -q <file1> <file2> will print nothing if both files are equal
+# It will say "Files <file1> and <file2> differ" otherwise.
+# Hint: remove -q option to show the lines that differ (not recommended when your output file is large)
+diff -q serial.sorted pgen.sorted
+
+

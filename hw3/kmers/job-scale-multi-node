@@ -1,0 +1,16 @@
+#!/bin/bash -l 
+#SBATCH -A mp309
+#SBATCH -p debug
+#SBATCH -N 8
+#SBATCH -t 00:20:00 
+#SBATCH -J multi-HW3
+#SBATCH -o multi-HW3.%j.out
+#SBATCH -e multi-HW3.%j.err
+
+# Specify path to your input file here
+INPUT=test
+
+cd ${PWD}
+for P in 96 120 144 168 192; do
+	upcrun -n $P -shared-heap=1G ./pgen ${INPUT}
+done

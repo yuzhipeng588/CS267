@@ -1,0 +1,15 @@
+#!/bin/bash -l 
+#SBATCH -A mp309
+#SBATCH -p debug
+#SBATCH -N 1
+#SBATCH -t 00:10:00 
+#SBATCH -J serial-HW3
+#SBATCH -o serial-HW3.%j.out
+#SBATCH -e serial-HW3.%j.err
+
+
+INPUT=test		# Path to your input file
+
+cd ${PWD}
+srun -n 1 ./serial ${INPUT}
+
