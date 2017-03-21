@@ -1,0 +1,210 @@
+
+    Report from: Interprocedural optimizations [ipo]
+
+  WHOLE PROGRAM (SAFE) [EITHER METHOD]: false
+  WHOLE PROGRAM (SEEN) [TABLE METHOD]: false
+  WHOLE PROGRAM (READ) [OBJECT READER METHOD]: false
+
+INLINING OPTION VALUES:
+  -inline-factor: 100
+  -inline-min-size: 30
+  -inline-max-size: 230
+  -inline-max-total-size: 2000
+  -inline-max-per-routine: 10000
+  -inline-max-per-compile: 500000
+
+In the inlining report below:
+   "sz" refers to the "size" of the routine. The smaller a routine's size,
+      the more likely it is to be inlined.
+   "isz" refers to the "inlined size" of the routine. This is the amount
+      the calling routine will grow if the called routine is inlined into it.
+      The compiler generally limits the amount a routine can grow by having
+      routines inlined into it.
+
+Begin optimization report for: print_matrix(double *, int, int)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (print_matrix(double *, int, int)) [1/3=33.3%] dgemm-blocked.c(17,1)
+  -> EXTERN: (21,9) printf(const char *__restrict__, ...)
+  -> EXTERN: (23,9) printf(const char *__restrict__, ...)
+  -> EXTERN: (24,5) printf(const char *__restrict__, ...)
+
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at dgemm-blocked.c(18,3)
+   remark #25096: Loop Interchange not done due to: Imperfect Loop Nest (Either at Source or due to other Compiler Transformations)
+   remark #25452: Original Order found to be proper, but by a close margin
+   remark #15382: vectorization support: call to function printf(const char *__restrict__, ...) cannot be vectorized   [ dgemm-blocked.c(21,9) ]
+   remark #15382: vectorization support: call to function printf(const char *__restrict__, ...) cannot be vectorized   [ dgemm-blocked.c(23,9) ]
+   remark #15382: vectorization support: call to function printf(const char *__restrict__, ...) cannot be vectorized   [ dgemm-blocked.c(24,5) ]
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between  line 21 and  line 24
+   remark #15346: vector dependence: assumed OUTPUT dependence between  line 24 and  line 21
+
+   LOOP BEGIN at dgemm-blocked.c(19,5)
+   <Predicate Optimized v1>
+      remark #25422: Invariant Condition at line 20 hoisted out of this loop
+      remark #15382: vectorization support: call to function printf(const char *__restrict__, ...) cannot be vectorized   [ dgemm-blocked.c(21,9) ]
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   LOOP END
+
+   LOOP BEGIN at dgemm-blocked.c(19,5)
+   <Predicate Optimized v2>
+      remark #15382: vectorization support: call to function printf(const char *__restrict__, ...) cannot be vectorized   [ dgemm-blocked.c(23,9) ]
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: new_avx_block(int, double *, double *, double *__restrict__)
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (new_avx_block(int, double *, double *, double *__restrict__)) dgemm-blocked.c(53,1)
+
+===========================================================================
+
+Begin optimization report for: square_dgemm(int, double *, double *, double *__restrict__)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (square_dgemm(int, double *, double *, double *__restrict__)) [3/3=100.0%] dgemm-blocked.c(104,1)
+  -> EXTERN: (118,5) exit(int)
+  -> EXTERN: (120,28) memalign(size_t, size_t)
+  -> EXTERN: (121,28) memalign(size_t, size_t)
+  -> EXTERN: (122,37) memalign(size_t, size_t)
+  -> INLINE: (157,9) new_avx_block(int, double *, double *, double *__restrict__) (isz = 238) (sz = 249)
+    -> EXTERN: (61,26) memalign(size_t, size_t)
+    -> EXTERN: (69,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (70,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (71,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (72,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (73,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (74,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (75,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (76,16) _mm256_mul_pd(__m256d, __m256d)
+    -> EXTERN: (78,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (79,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (80,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (81,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (82,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (83,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (84,20) _mm256_add_pd(__m256d, __m256d)
+    -> EXTERN: (86,20) _mm256_extractf128_pd(__m256d, const int)
+    -> EXTERN: (87,18) _mm_add_pd(__m128d, __m128d)
+    -> EXTERN: (87,39) _mm256_castpd256_pd128(__m256d)
+    -> EXTERN: (88,18) _mm_hadd_pd(__m128d, __m128d)
+    -> EXTERN: (88,37) _mm_setzero_pd(void)
+    -> EXTERN: (89,9) _mm_store1_pd(double *, __m128d)
+    -> EXTERN: (95,5) exit(int)
+  -> EXTERN: (165,5) memcpy(void *__restrict__, const void *__restrict__, size_t)
+
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at dgemm-blocked.c(128,3)
+   remark #25101: Loop Interchange not done due to: Original Order seems proper
+   remark #25452: Original Order found to be proper, but by a close margin
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at dgemm-blocked.c(130,5)
+      remark #15542: loop was not vectorized: inner loop was already vectorized
+
+      LOOP BEGIN at dgemm-blocked.c(132,7)
+         remark #15542: loop was not vectorized: inner loop was already vectorized
+
+         LOOP BEGIN at dgemm-blocked.c(134,9)
+         <Peeled>
+         LOOP END
+
+         LOOP BEGIN at dgemm-blocked.c(134,9)
+            remark #15389: vectorization support: reference new_A has unaligned access   [ dgemm-blocked.c(144,13) ]
+            remark #15388: vectorization support: reference new_B has aligned access   [ dgemm-blocked.c(146,13) ]
+            remark #15389: vectorization support: reference B has unaligned access   [ dgemm-blocked.c(146,13) ]
+            remark #15389: vectorization support: reference new_A has unaligned access   [ dgemm-blocked.c(140,13) ]
+            remark #15388: vectorization support: reference new_B has aligned access   [ dgemm-blocked.c(141,13) ]
+            remark #15389: vectorization support: reference new_A has unaligned access   [ dgemm-blocked.c(144,13) ]
+            remark #15388: vectorization support: reference new_B has aligned access   [ dgemm-blocked.c(146,13) ]
+            remark #15389: vectorization support: reference new_A has unaligned access   [ dgemm-blocked.c(140,13) ]
+            remark #15388: vectorization support: reference new_B has aligned access   [ dgemm-blocked.c(141,13) ]
+            remark #15381: vectorization support: unaligned access used inside loop body
+            remark #15300: LOOP WAS VECTORIZED
+            remark #15442: entire loop may be executed in remainder
+            remark #15448: unmasked aligned unit stride loads: 1 
+            remark #15449: unmasked aligned unit stride stores: 2 
+            remark #15450: unmasked unaligned unit stride loads: 2 
+            remark #15451: unmasked unaligned unit stride stores: 2 
+            remark #15460: masked strided loads: 1 
+            remark #15475: --- begin vector loop cost summary ---
+            remark #15476: scalar loop cost: 33 
+            remark #15477: vector loop cost: 20.500 
+            remark #15478: estimated potential speedup: 1.430 
+            remark #15479: lightweight vector operations: 30 
+            remark #15488: --- end vector loop cost summary ---
+            remark #25015: Estimate of max trip count of loop=8
+         LOOP END
+
+         LOOP BEGIN at dgemm-blocked.c(134,9)
+         <Remainder>
+         LOOP END
+      LOOP END
+   LOOP END
+LOOP END
+
+LOOP BEGIN at dgemm-blocked.c(151,3)
+   remark #25096: Loop Interchange not done due to: Imperfect Loop Nest (Either at Source or due to other Compiler Transformations)
+   remark #25451: Advice: Loop Interchange, if possible, might help loopnest. Suggested Permutation: ( 1 2 3 4 5 ) --> ( 5 2 3 1 4 ) 
+   remark #15382: vectorization support: call to function memalign(size_t, size_t) cannot be vectorized   [ dgemm-blocked.c(61,26) ]
+   remark #15382: vectorization support: call to function _mm_store1_pd(double *, __m128d) cannot be vectorized   [ dgemm-blocked.c(89,9) ]
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+   remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+
+   LOOP BEGIN at dgemm-blocked.c(152,5)
+      remark #25096: Loop Interchange not done due to: Imperfect Loop Nest (Either at Source or due to other Compiler Transformations)
+      remark #25451: Advice: Loop Interchange, if possible, might help loopnest. Suggested Permutation: ( 1 2 3 4 ) --> ( 4 2 1 3 ) 
+      remark #15382: vectorization support: call to function memalign(size_t, size_t) cannot be vectorized   [ dgemm-blocked.c(61,26) ]
+      remark #15382: vectorization support: call to function _mm_store1_pd(double *, __m128d) cannot be vectorized   [ dgemm-blocked.c(89,9) ]
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+      remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+
+      LOOP BEGIN at dgemm-blocked.c(154,7)
+         remark #25096: Loop Interchange not done due to: Imperfect Loop Nest (Either at Source or due to other Compiler Transformations)
+         remark #25451: Advice: Loop Interchange, if possible, might help loopnest. Suggested Permutation: ( 1 2 3 ) --> ( 3 1 2 ) 
+         remark #15382: vectorization support: call to function memalign(size_t, size_t) cannot be vectorized   [ dgemm-blocked.c(61,26) ]
+         remark #15382: vectorization support: call to function _mm_store1_pd(double *, __m128d) cannot be vectorized   [ dgemm-blocked.c(89,9) ]
+         remark #15344: loop was not vectorized: vector dependence prevents vectorization
+         remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+         remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+
+         LOOP BEGIN at dgemm-blocked.c(62,3) inlined into dgemm-blocked.c(157,9)
+            remark #25095: Loop Interchange not done due to: User Function Inside Loop Nest
+            remark #25451: Advice: Loop Interchange, if possible, might help loopnest. Suggested Permutation: ( 1 2 ) --> ( 2 1 ) 
+            remark #15382: vectorization support: call to function _mm_store1_pd(double *, __m128d) cannot be vectorized   [ dgemm-blocked.c(89,9) ]
+            remark #15344: loop was not vectorized: vector dependence prevents vectorization
+            remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+            remark #15346: vector dependence: assumed OUTPUT dependence between  line 89 and  line 89
+
+            LOOP BEGIN at dgemm-blocked.c(65,5) inlined into dgemm-blocked.c(157,9)
+               remark #15310: loop was not vectorized: operation cannot be vectorized   [ dgemm-blocked.c(69,16) ]
+            LOOP END
+         LOOP END
+      LOOP END
+   LOOP END
+LOOP END
+
+LOOP BEGIN at dgemm-blocked.c(164,3)
+   remark #15527: loop was not vectorized: function call to memcpy(void *__restrict__, const void *__restrict__, size_t) cannot be vectorized   [ dgemm-blocked.c(165,5) ]
+LOOP END
+
+    Report from: Code generation optimizations [cg]
+
+dgemm-blocked.c(165,5):remark #34014: optimization advice for memcpy: increase the destination's alignment to 16 (and use __assume_aligned) to speed up library implementation
+dgemm-blocked.c(165,5):remark #34014: optimization advice for memcpy: increase the source's alignment to 16 (and use __assume_aligned) to speed up library implementation
+dgemm-blocked.c(165,5):remark #34026: call to memcpy implemented as a call to optimized library version
+===========================================================================
